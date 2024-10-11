@@ -1,142 +1,130 @@
-import React, { useEffect, useState } from 'react'
-import styled from 'styled-components'
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import axios from "axios";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
+import Snackbar from "@mui/material/Snackbar";
 
-import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
+import search from "../assets/search.png";
+import coupon from "../assets/1569377.png";
+import heartunfilled from "../assets/heartunfilled.png";
+import heartfilled from "../assets/heartfilled.png";
 
-import search from "../assets/search.png"
-import coupon from "../assets/coupon.png"
-import heartunfilled from "../assets/heartunfilled.png"
-import heartfilled from "../assets/heartfilled.png"
-import addbtn from "../assets/addbtn.png"
+import {
+  updateFavourites,
+  removeFavourites,
+  addToCart,
+  increaseItemValue,
+} from "../redux/slice";
 
-import { updateFavourites, removeFavourites, addToCart, increaseItemValue } from '../redux/slice';
-
-import Menu from '../components/Menu';
-import { useDispatch, useSelector } from 'react-redux';
-
+import Menu from "../components/Menu";
+import { useDispatch, useSelector } from "react-redux";
 
 function Home() {
-
   const [products, setProducts] = useState([]);
-
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
-
   const [state, setState] = React.useState({
     open: false,
-    vertical: 'top',
-    horizontal: 'center',
+    vertical: "top",
+    horizontal: "center",
   });
- 
-
-  const { vertical, horizontal, open } = state ; 
-
-
-  const handleClick = (newState) => () => {
-    setState({ ...newState, open: true });
-  };
-  const handleClose = () => {
-    setState({ ...state, open: false });
-  };
-
-
-
-  const { favourites } = useSelector(state => state.project);
-  const { cart } = useSelector(state => state.project);
-
-  console.log(cart)
+  const { vertical, horizontal, open } = state;
+  const { favourites } = useSelector((state) => state.project);
+  const { cart } = useSelector((state) => state.project);
 
   useEffect(() => {
     const fetcher = async () => {
       const res = await axios.get("https://dummyjson.com/products");
       setProducts(res.data.products);
-    }
-    fetcher()
-  }, [])
-
+    };
+    fetcher();
+  }, []);
 
   const addProductToFavourite = (index) => {
     const product = products[index];
     dispatch(updateFavourites([...favourites, product]));
-    handleClick({ vertical: 'bottom', horizontal: 'center' });
-  }
+    handleClick({ vertical: "bottom", horizontal: "center" });
+  };
 
   const removeProductFromFavourite = (index) => {
     const product = products[index];
     dispatch(removeFavourites(product));
-  }
+  };
 
   const addItemToCart = (index) => {
-    let product = { ...products[index] }; // Create a new object with spread operator
-    let flag = cart?.some(obj => obj.id === product?.id);
-  
+    let product = { ...products[index] };
+    let flag = cart?.some((obj) => obj.id === product?.id);
+
     if (!flag) {
       product["num"] = 1;
       dispatch(addToCart([...cart, product]));
     } else {
       dispatch(increaseItemValue(product));
     }
-  }
+  };
+
+  const handleClick = (newState) => () => {
+    setState({ ...newState, open: true });
+  };
+
+  const handleClose = () => {
+    setState({ ...state, open: false });
+  };
 
   return (
     <>
       <Header>
-        <div id="name" >
+        <div id="name">
           <div>
-            <p style={{ fontWeight: "500" }} >
-              Hey, Rahul
-            </p>
+            <p style={{ fontWeight: "500" }}>Hey, Rahul</p>
           </div>
-          <Link to="/cart" style={{ textDecoration: "none" }} >
-            <div >
-
+          <Link to="/cart" style={{ textDecoration: "none" }}>
+            <div>
               <ShoppingBagOutlinedIcon style={{ color: "white" }} />
-              {cart.length !== 0 && <span id="cartval" >{cart?.length}</span>}
+              {cart.length !== 0 && <span id="cartval">{cart?.length}</span>}
             </div>
           </Link>
         </div>
 
         <SearchBox>
-          <span><img src={search} /></span>
           <span>
-            <input type='text' placeholder='Search Products or store' />
+            <img src={search} />
+          </span>
+          <span>
+            <input type="text" placeholder="Search Products or store" />
           </span>
         </SearchBox>
 
         <Address>
           <div>
             <p>DELIVERY TO</p>
-            <span id="addressval" ><p>Green Way 3000, Sylhet</p>
+            <span id="addressval">
+              <p>Green Way 3000, Sylhet</p>
               <KeyboardArrowDownIcon style={{ color: "#A9B4BC" }} />
             </span>
-
           </div>
 
           <div>
             <p>WITHIN</p>
-            <span id="addressval" ><p>1 Hour</p>
+            <span id="addressval">
+              <p>1 Hour</p>
               <KeyboardArrowDownIcon style={{ color: "#A9B4BC" }} />
             </span>
           </div>
         </Address>
       </Header>
 
-      <CouponsConatiner>
+      <CouponsContainer>
         <Coupon>
           <span>
             <img src={coupon} />
           </span>
           <span>
-            <p id="getter" >
-              Get
-            </p>
+            <p id="getter">Get</p>
             <h3>50% OFF</h3>
-            <p >On first 03 orders</p>
+            <p>On first 03 orders</p>
           </span>
         </Coupon>
 
@@ -145,11 +133,9 @@ function Home() {
             <img src={coupon} />
           </span>
           <span>
-            <p id="getter" >
-              Get
-            </p>
+            <p id="getter">Get</p>
             <h3>50% OFF</h3>
-            <p >On first 03 orders</p>
+            <p>On first 03 orders</p>
           </span>
         </Coupon>
 
@@ -158,238 +144,308 @@ function Home() {
             <img src={coupon} />
           </span>
           <span>
-            <p id="getter" >
-              Get
-            </p>
+            <p id="getter">Get</p>
             <h3>50% OFF</h3>
-            <p >On first 03 orders</p>
+            <p>On first 03 orders</p>
           </span>
         </Coupon>
-      </CouponsConatiner>
+      </CouponsContainer>
 
       <ProductContainer>
         <h2>Recommended</h2>
 
         <div>
-
-          {products && products.map((item, index) => (
-
-
-            <Product key={index}  >
-              <span  >
-                {favourites?.some(obj => obj.id === item.id) ? <img onClick={() => removeProductFromFavourite(index)} className='heart' src={heartfilled} />
-                  : <img onClick={() => addProductToFavourite(index)} className='heart' src={heartunfilled} />
-                }
-              </span>
-              <img onClick={() => navigate(`productinfo/${item.id}`)} className='product-img' src={item.thumbnail} />
-              <div className='adddbtn-container' >
-                <  span className='price' >
-                  $ {item.price}
+          {products &&
+            products.map((item, index) => (
+              <Product key={index}>
+                <span>
+                  {favourites?.some((obj) => obj.id === item.id) ? (
+                    <img
+                      onClick={() => removeProductFromFavourite(index)}
+                      className="heart"
+                      src={heartfilled}
+                    />
+                  ) : (
+                    <img
+                      onClick={() => addProductToFavourite(index)}
+                      className="heart"
+                      src={heartunfilled}
+                    />
+                  )}
                 </span>
-                <span id="add-btn" >
-                  <img src={addbtn} onClick={() => addItemToCart(index)} />
-                </span>
-              </div>
-              < p onClick={() => navigate(`productinfo/${item.id}`)} className="product-name" >{item.title}</p>
-            </Product>
-          ))
-
-          }
-
+                <img
+                  onClick={() => navigate(`productinfo/${item.id}`)}
+                  className="product-img"
+                  src={item.thumbnail}
+                />
+                <p
+                  onClick={() => navigate(`productinfo/${item.id}`)}
+                  className="product-name"
+                >
+                  {item.title}
+                </p>
+                <span className="price">$ {item.price}</span>
+                <div className="button-container">
+                  <button
+                    className="cart-btn"
+                    onClick={() => addItemToCart(index)}
+                  >
+                    Add to Cart
+                  </button>
+                  <button
+                    className="buy-btn"
+                    onClick={() => addItemToCart(index)}
+                  >
+                    Buy Now
+                  </button>
+                </div>
+              </Product>
+            ))}
         </div>
 
         <Snackbar
-        anchorOrigin={{ vertical, horizontal }}
-        open={open}
-        onClose={handleClose}
-        message="I love snacks"
-        key={vertical + horizontal}
-      />
+          anchorOrigin={{ vertical, horizontal }}
+          open={open}
+          onClose={handleClose}
+          message="I love snacks"
+          key={vertical + horizontal}
+        />
       </ProductContainer>
-     
-      <Menu />
 
+      <Menu />
     </>
-  )
+  );
 }
 
 export default Home;
 
-
 const Header = styled.div`
-background-color: #2A4BA0;
-padding:  40px 20px;
-padding-bottom: 5px;
+  background-color: #2a4ba0;
+  padding: 15px 20px;
+  display: flex;
+  flex-direction: column;
 
-#name{
+  #name {
     display: flex;
     justify-content: space-between;
     align-items: center;
 
-    div{
+    div {
       display: flex;
       align-items: center;
-      justify-content: center;
     }
 
-    p{
-      display: contents;
-      font-size:22px;
-      color:white;
+    p {
+      font-size: 22px;
+      color: white;
       font-family: "Manrope", sans-serif;
-      justify-self: center;
-      align-self: center;
     }
 
-    #cartval{
-      margin-left: -13px;
-      margin-top: -13px;
-      color:white;
+    #cartval {
+      margin-left: -10px;
+      margin-top: -10px;
+      color: white;
       font-weight: bold;
       height: 20px;
       width: 20px;
       padding: 2px;
+      border-radius: 50%;
+      background-color: #ffc83a;
       display: flex;
       justify-content: center;
       align-items: center;
-      border-radius:50%;
-      background-color: #FFC83A;
+      font-size: 12px;
     }
-}
-`
+  }
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    padding: 15px 40px;
+
+    #name {
+      flex: 1;
+    }
+  }
+`;
 
 const SearchBox = styled.div`
-display: flex;
-gap:20px;
-margin: 35px 0px;
-background: #153075;
-padding: 15px;
-border-radius: 25px;
+  display: flex;
+  gap: 20px;
+  margin: 35px 0;
+  background: #153075;
+  padding: 15px;
+  border-radius: 25px;
 
-input{
-  width: 100%;
+  input {
+    width: 100%;
     background: transparent;
     border: none;
-    outline:none;
-}
-`
+    outline: none;
+  }
+
+  @media (min-width: 768px) {
+    margin: 50px 0;
+  }
+`;
 
 const Address = styled.div`
-font-family: "Manrope", sans-serif;
-display: flex;
-justify-content: space-between;
-
-p:nth-child(1){
-  color:#A9B4BC;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-#addressval{
-  display: flex;
-  margin-top: -10px;
-  p{
-    
-    color:white;
-    font-size: 15px;
-  }
-}
-`
-
-const CouponsConatiner = styled.section`
-padding: 25px 20px;
-display: flex;
-gap:20px;
-overflow-x: scroll;
-`
-
-const Coupon = styled.div`
-font-family: "Manrope", sans-serif;
-background-color: #F9B023;
-display: flex;
-gap:23px;
-padding: 10px 20px;
-border-radius:15px;
-color:white;
-align-items: center;
-height: 140px;
-
-h3{
-  font-weight: bold;
-  font-size: 25px;
-  margin-top: -15px;
-}
-
-#getter{
-  font-size: 30px;
-}
-
-img{
-  height: 75px;
-}
-
-span :nth-child(2){
-  width: 125px;
-}
-`
-
-const ProductContainer = styled.section`
-padding: 20px;
-padding-top:0px;
-font-family: "Manrope", sans-serif;
-font-size: 30px;
-font-weight: 400;
-
->div {
-    display: flex;
-    flex-wrap: wrap;
-    gap:20px;
-}
-
-h2{
-  font-weight: 400;
-    font-size: 32px;
-}
-`
-
-const Product = styled.div`
-background-color: #F8F9FB;
-display: flex;
-flex-grow: 2;
-flex-direction: column;
-width: 40%;
-border-radius: 15px;
-padding: 10px;
-
-.price{
-  font-weight: bold;
-    font-size: 16px;
-}
-
-.product-img{
-  align-self: center;
-  width:80%;
-  height: fit-content;
-  height: 65px;
-  margin: 10px 0px;
-}
-
-.product-name{
-  color:#616A7D;
-  font-size: 13px;
-}
-
-.heart{
-  width: 20px;
-}
-
-.adddbtn-container{
   display: flex;
   justify-content: space-between;
+
+  p {
+    color: #a9b4bc;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  #addressval {
+    display: flex;
+    margin-top: -10px;
+
+    p {
+      color: white;
+      font-size: 15px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    justify-content: flex-start;
+  }
+`;
+
+const CouponsContainer = styled.section`
+  padding: 25px 20px;
+  display: flex;
+  gap: 20px;
+  justify-content: center; // Center the coupon boxes horizontally
+  overflow-x: auto;
+
+  @media (min-width: 768px) {
+    padding: 30px 40px;
+    overflow: hidden;
+    flex-wrap: wrap;
+    justify-content: center; // Ensure it's also centered on larger screens
+  }
+`;
+
+const Coupon = styled.div`
+  background-color: #f9b023;
+  display: flex;
+  gap: 23px;
+  padding: 10px 20px;
+  border-radius: 15px;
+  color: white;
   align-items: center;
-}
+  height: 140px;
+  flex: 1;
 
+  h3 {
+    font-weight: bold;
+    font-size: 25px;
+    margin-top: -15px;
+  }
 
-`
+  img {
+    height: auto;
+    max-height: 75px;
+    width: auto;
+  }
 
+  @media (min-width: 768px) {
+    flex: 0 1 30%;
+  }
+`;
 
+const ProductContainer = styled.section`
+  padding: 20px;
+  font-family: "Manrope", sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+
+  > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  h2 {
+    font-weight: 400;
+    font-size: 32px;
+  }
+`;
+
+const Product = styled.div`
+  background-color: #f8f9fb;
+  display: flex;
+  flex-direction: column;
+  border-radius: 15px;
+  padding: 10px;
+  width: calc(50% - 20px);
+
+  @media (min-width: 768px) {
+    width: calc(25% - 20px);
+  }
+
+  .price {
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  .product-img {
+    align-self: center;
+    width: 100%;
+    max-height: 150px;
+    object-fit: contain;
+    margin: 10px 0;
+  }
+
+  .product-name {
+    color: #616a7d;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .heart {
+    width: 24px;
+    cursor: pointer;
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    width: 100%;
+
+    .cart-btn,
+    .buy-btn {
+      flex: 1;
+      margin: 0 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .cart-btn {
+      background-color: #ffc83a;
+      border: none;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #e0b420;
+      }
+    }
+
+    .buy-btn {
+      background-color: #2a4ba0;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #1e222b;
+      }
+    }
+  }
+`;

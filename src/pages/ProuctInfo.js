@@ -1,219 +1,205 @@
-import React, { useEffect, useState } from 'react'
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
-import styled from 'styled-components';
-import star from "../assets/Star.png"
-import halfstar from "../assets/halfstar.png"
-import Carousal from '../components/Carousal';
-import { useLocation } from 'react-router-dom';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
+import styled from "styled-components";
+import star from "../assets/Star.png";
+import Carousal from "../components/Carousal";
+import { useLocation, Link } from "react-router-dom";
+import axios from "axios";
 
-function ProuctInfo() {
+function ProductInfo() {
+  const [product, setProduct] = useState({});
+  const location = useLocation();
 
-    const [product, setProduct] = useState([]);
+  useEffect(() => {
+    const fetcher = async () => {
+      const res = await axios.get(
+        `https://dummyjson.com/products/${location.pathname.split("/")[2]}`
+      );
+      setProduct(res.data);
+      console.log(res.data);
+    };
+    fetcher();
+  }, [location.pathname]);
 
-    const location = useLocation();
+  const times = Array.from({ length: Math.trunc(Math.ceil(product?.rating)) });
 
+  return (
+    <Container>
+      <Header>
+        <span>
+          <Link to="/" style={{ color: "black" }}>
+            <KeyboardArrowLeftIcon />
+          </Link>
+        </span>
+        <Link to="/cart" style={{ color: "black", textDecoration: "none" }}>
+          <div id="cart">
+            <ShoppingBagOutlinedIcon />
+            <span>4</span>
+          </div>
+        </Link>
+      </Header>
 
-    useEffect(() => {
-        const fetcher = async () => {
-            const res = await axios.get(`https://dummyjson.com/products/${location.pathname.split("/")[2]}`)
-            setProduct(res.data);
-            console.log(res.data)
-        }
-        fetcher();
-    }, [])
+      <h3>{product?.brand}</h3>
+      <h3>{product?.title}</h3>
 
-    const times = Array.from({ length: Math.trunc(Math.ceil(parseInt(product?.rating))) });
+      <Ratings>
+        <span>
+          {times.map((_, index) => (
+            <img key={index} src={star} alt="Star" />
+          ))}
+        </span>
+        <span>{product?.stock} Reviews</span>
+      </Ratings>
 
-    return (
-        <Container>
-            <Header>
-                <span>
-                    <Link to="/" style={{ color: "black" }}>
-                        <KeyboardArrowLeftIcon />
-                    </Link>
-                </span>
-                <Link to="/cart" style={{ color: "black", textDecoration: "none" }}>
-                    <div id="cart" >
+      <ImageContainer>
+        <Carousal images={product?.images} />
+      </ImageContainer>
 
-                        <ShoppingBagOutlinedIcon />
-                        <span>4</span>
-                    </div>
-                </Link>
-            </Header>
+      <DiscountContainer>
+        <span id="bolder">{`$ ${product?.price}`}</span>
+        <span id="discount">{`$${(
+          (product?.discountPercentage / 100) *
+          product?.price
+        ).toFixed(2)} OFF`}</span>
+      </DiscountContainer>
 
-            <h3 style={{ fontWeight: "300", marginTop: "20px" }} > {product?.brand} </h3>
-            <h3> {product?.title}</h3>
+      <BTNContainer>
+        <button id="left">Add to Cart</button>
+        <button id="right">Buy Now</button>
+      </BTNContainer>
 
-            <Ratings>
-                <span>
-                    {times.map((_, index) => (
-                        <img key={index} src={star} />
-                    ))
-                    }
-
-
-                </span>
-                <span>
-                    {product?.stock} Reviews
-                </span>
-            </Ratings>
-
-            <ImageConatainer>
-                <Carousal images={product?.images} />
-            </ImageConatainer>
-
-            <DiscountContainer>
-                <span id="bolder" >
-                    {`$ ${product?.price}`}
-                </span>
-                <span id="discount" >
-                    { `$${(((product?.discountPercentage)/100)*(product?.price)).toFixed(2)} ` }OFF
-                </span>
-            </DiscountContainer>
-
-            <BTNContainer>
-                <button id="left" >
-                    Add to Cart
-                </button>
-                <button id="right" >
-                    Buy Now
-                </button>
-            </BTNContainer>
-
-            <BottomConatiner>
-                <span>
-                    Details
-                </span>
-                <p>
-                   {product?.description}
-                </p>
-            </BottomConatiner>
-
-        </Container>
-    )
+      <BottomContainer>
+        <span>Details</span>
+        <p>{product?.description}</p>
+      </BottomContainer>
+    </Container>
+  );
 }
 
-export default ProuctInfo
+export default ProductInfo;
 
 const Container = styled.div`
-padding: 40px 0px;
-font-family: "Manrope";
+  padding: 40px 20px;
+  font-family: "Manrope";
 
-h3{
+  h3 {
     font-weight: bold;
-    font-size: 40px;
-    font-family: "Manrope";
-    margin: 15px 5px;
-    padding: 0px 20px;
-}
-`
+    font-size: 30px;
+    margin: 15px 0;
+  }
+
+  @media (min-width: 768px) {
+    padding: 60px 40px;
+
+    h3 {
+      font-size: 40px;
+    }
+  }
+`;
 
 const Ratings = styled.div`
-display: flex;
-gap: 10px;
-align-items: center;
-padding: 0px 20px;
-img{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 0 20px;
+
+  img {
     width: 20px;
-}
-`
+  }
+`;
 
 const Header = styled.div`
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 0px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
 
->span{
-    background-color: #F8F9FB;
+  > span {
+    background-color: #f8f9fb;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 16px;
-    width: 7px;
-    height: 7px;
-}
+  }
 
-#cart{
+  #cart {
     display: flex;
     align-items: center;
-    
-    span{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 20px;
-        height: 20px;
-        padding: 3px;
-        background-color: #FFC83A;
-        padding: 0px 6px;
-        border-radius: 50%;
-        margin-left: -16px;
-        margin-top: -19px;
-    }
-}
-`
 
-const ImageConatainer = styled.div`
-background-color: antiquewhite;
-width: 100%;
-height: 220px;
-margin: 10px 0px;
-`
+    span {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 20px;
+      height: 20px;
+      padding: 3px 6px;
+      background-color: #ffc83a;
+      border-radius: 50%;
+      margin-left: -16px;
+    }
+  }
+`;
+
+const ImageContainer = styled.div`
+  background-color: antiquewhite;
+  width: 100%;
+  height: 220px;
+  margin: 10px 0;
+`;
+
 const DiscountContainer = styled.div`
-display: flex;
-gap: 20px;
-padding: 0px 20px;
-margin: 25px 0px;
-#discount{
-    background: #2A4BA0;
+  display: flex;
+  gap: 20px;
+  padding: 0 20px;
+  margin: 25px 0;
+
+  #discount {
+    background: #2a4ba0;
     border-radius: 20px;
     font-size: 11px;
     padding: 3px 12px;
     color: white;
-}
+  }
 
-#bolder{
+  #bolder {
     font-weight: bold;
-    color:#2A4BA0;
-}
-`
+    color: #2a4ba0;
+  }
+`;
 
 const BTNContainer = styled.div`
-padding:  0px 20px ;
-display: flex;
-justify-content: space-between;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
 
-#left{
+  #left,
+  #right {
     width: 140px;
     padding: 15px 25px;
-    border: 2px solid #2A4BA0;
-    outline: none;
     border-radius: 12px;
+    outline: none;
+  }
+
+  #left {
+    border: 2px solid #2a4ba0;
     background: transparent;
-}
+  }
 
-#right{
-    width: 140px;
-    padding: 15px 25px;
-    background: #2A4BA0;
-    outline: none;
-    border-radius: 12px;
+  #right {
+    background: #2a4ba0;
     color: white;
     border: none;
-}
+  }
+`;
 
-`
+const BottomContainer = styled.div`
+  padding: 20px;
+  margin: 10px 0;
 
-const BottomConatiner = styled.div`
-padding:20px;
-margin: 10px 0px;
-p{
-    color:#8891A5;
+  p {
+    color: #8891a5;
     font-size: 15px;
-}
-`
+  }
+`;
